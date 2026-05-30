@@ -102,7 +102,8 @@ public class SchemaRecallNode implements NodeAction {
 				schemaService.getTableDocumentsByDatasource(datasourceId, input));
 		// extract table names
 		List<String> recalledTableNames = extractTableName(tableDocuments);
-		List<Document> columnDocuments = schemaService.getColumnDocumentsByTableName(datasourceId, recalledTableNames);
+		List<Document> columnDocuments = schemaService.getColumnDocumentsByQueryAndTables(datasourceId, input,
+				recalledTableNames);
 
 		String failMessage = """
 				\n 未检索到相关数据表

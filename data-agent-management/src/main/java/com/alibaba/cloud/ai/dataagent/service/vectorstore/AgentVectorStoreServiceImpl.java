@@ -242,6 +242,29 @@ public class AgentVectorStoreServiceImpl implements AgentVectorStoreService {
 	}
 
 	@Override
+	public List<Document> searchWithFilter(String query, Filter.Expression filterExpression, int topK,
+			double similarityThreshold) {
+		Assert.hasText(query, "query cannot be empty");
+		Assert.notNull(filterExpression, "filterExpression cannot be null");
+
+		HybridSearchRequest hybridRequest = HybridSearchRequest.builder()
+			.query(query)
+			.topK(topK)
+			.similarityThreshold(similarityThreshold)
+			.filterExpression(filterExpression)
+			.build();
+
+		if (dataAgentProperties.getVectorStore().isEnableHybridSearch() && hybridRetrievalStrategy.isPresent()) {
+			return hybridRetrievalStrategy.get().retrieve(hybridRequest);
+		}
+		log.debug("Hybrid search not enabled, using vector-search only for custom filter search");
+		List<Document> results = vectorStore.similaritySearch(hybridRequest.toVectorSearchRequest());
+		log.debug("searchWithFilter completed, found {} documents with topK={}, threshold={}", results.size(), topK,
+				similarityThreshold);
+		return results;
+	}
+
+	@Override
 	public boolean hasDocuments(String agentId) {
 		// 类似 MySQL 的 LIMIT 1,只检查是否存在文档
 		List<Document> docs = vectorStore.similaritySearch(org.springframework.ai.vectorstore.SearchRequest.builder()

@@ -295,6 +295,16 @@ public class DataAgentProperties {
 		 */
 		private String filePath = "./vectorstore/vectorstore.json";
 
+		/**
+		 * 列级语义搜索 TopK 限制。控制每次召回查询相关列的数量。值越大包含更多列但增加 prompt 大小。
+		 */
+		private int columnTopkLimit = 15;
+
+		/**
+		 * 列级相似度阈值。设置较低值以避免漏掉 JOIN 所需的列。
+		 */
+		private double columnSimilarityThreshold = 0.1;
+
 	}
 
 }

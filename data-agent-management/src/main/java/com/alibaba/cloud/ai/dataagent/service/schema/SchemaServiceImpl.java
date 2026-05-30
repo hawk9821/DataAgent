@@ -39,7 +39,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.BatchingStrategy;
-import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
@@ -298,15 +297,8 @@ public class SchemaServiceImpl implements SchemaService {
 
 		Filter.Expression filterExpression = DynamicFilterService.combineWithAnd(conditions);
 
-		// 执行向量检索
-		SearchRequest searchRequest = SearchRequest.builder()
-			.query(query)
-			.topK(tableTopK)
-			.similarityThreshold(tableThreshold)
-			.filterExpression(filterExpression)
-			.build();
-
-		return agentVectorStoreService.getDocumentsOnlyByFilter(filterExpression, tableTopK);
+		// 使用语义搜索，按查询相关度排序召回表
+		return agentVectorStoreService.searchWithFilter(query, filterExpression, tableTopK, tableThreshold);
 	}
 
 	private List<String> getMissingTableNamesWithForeignKeySet(List<Document> tableDocuments,
@@ -519,6 +511,28 @@ public class SchemaServiceImpl implements SchemaService {
 		// TopK=表数量×最大预估列数
 		return agentVectorStoreService.getDocumentsOnlyByFilter(filterExpression,
 				tableNames.size() * dataAgentProperties.getMaxColumnsPerTable());
+	}
+
+	@Override
+	public List<Document> getColumnDocumentsByQueryAndTables(Integer datasourceId, String query,
+			List<String> tableNames) {
+		Assert.notNull(datasourceId, "datasourceId cannot be null.");
+		if (tableNames.isEmpty()) {
+			log.warn("TableNames is empty. We need tableNames to search their columns");
+			return Collections.emptyList();
+		}
+
+		Filter.Expression filterExpression = dynamicFilterService.buildFilterExpressionForSearchColumns(datasourceId,
+				tableNames);
+		if (filterExpression == null) {
+			log.error("FilterExpression is null. This should not happen when tableNames is not empty");
+			return Collections.emptyList();
+		}
+
+		int columnTopK = dataAgentProperties.getVectorStore().getColumnTopkLimit();
+		double columnThreshold = dataAgentProperties.getVectorStore().getColumnSimilarityThreshold();
+
+		return agentVectorStoreService.searchWithFilter(query, filterExpression, columnTopK, columnThreshold);
 	}
 
 }

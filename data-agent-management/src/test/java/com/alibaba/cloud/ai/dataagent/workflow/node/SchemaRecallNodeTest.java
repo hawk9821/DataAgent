@@ -84,7 +84,7 @@ class SchemaRecallNodeTest {
 
 		List<Document> tableDocs = List.of(createTableDocument("users"));
 		when(schemaService.getTableDocumentsByDatasource(eq(100), anyString())).thenReturn(tableDocs);
-		when(schemaService.getColumnDocumentsByTableName(eq(100), anyList()))
+		when(schemaService.getColumnDocumentsByQueryAndTables(eq(100), anyString(), anyList()))
 			.thenReturn(List.of(new Document("col doc")));
 
 		Map<String, Object> result = schemaRecallNode.apply(state);
@@ -113,7 +113,8 @@ class SchemaRecallNodeTest {
 
 		when(agentDatasourceMapper.selectActiveDatasourceIdByAgentId(3L)).thenReturn(200);
 		when(schemaService.getTableDocumentsByDatasource(eq(200), anyString())).thenReturn(Collections.emptyList());
-		when(schemaService.getColumnDocumentsByTableName(eq(200), anyList())).thenReturn(Collections.emptyList());
+		when(schemaService.getColumnDocumentsByQueryAndTables(eq(200), anyString(), anyList()))
+			.thenReturn(Collections.emptyList());
 
 		Map<String, Object> result = schemaRecallNode.apply(state);
 
@@ -130,7 +131,7 @@ class SchemaRecallNodeTest {
 
 		List<Document> tableDocs = List.of(createTableDocument("users"), createTableDocument("orders"));
 		when(schemaService.getTableDocumentsByDatasource(eq(300), anyString())).thenReturn(tableDocs);
-		when(schemaService.getColumnDocumentsByTableName(eq(300), anyList()))
+		when(schemaService.getColumnDocumentsByQueryAndTables(eq(300), anyString(), anyList()))
 			.thenReturn(List.of(new Document("col1"), new Document("col2")));
 
 		Map<String, Object> result = schemaRecallNode.apply(state);
@@ -163,7 +164,7 @@ class SchemaRecallNodeTest {
 		List<Document> tableDocs = new ArrayList<>(List.of(validDoc, noNameDoc));
 
 		when(schemaService.getTableDocumentsByDatasource(eq(500), anyString())).thenReturn(tableDocs);
-		when(schemaService.getColumnDocumentsByTableName(eq(500), eq(List.of("users"))))
+		when(schemaService.getColumnDocumentsByQueryAndTables(eq(500), anyString(), eq(List.of("users"))))
 			.thenReturn(Collections.emptyList());
 
 		Map<String, Object> result = schemaRecallNode.apply(state);

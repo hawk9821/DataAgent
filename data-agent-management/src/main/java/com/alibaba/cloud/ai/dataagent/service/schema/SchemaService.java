@@ -37,4 +37,14 @@ public interface SchemaService {
 
 	List<Document> getColumnDocumentsByTableName(Integer datasourceId, List<String> tableNames);
 
+	/**
+	 * 按语义相关度召回指定表的列文档。与 getColumnDocumentsByTableName 不同，此方法使用 query
+	 * 进行向量相似度排序，只返回与查询语义相关的列，而非指定表的所有列。
+	 * @param datasourceId 数据源 ID
+	 * @param query 用户查询文本
+	 * @param tableNames 限定的表名列表
+	 * @return 按语义相关度排序的列文档列表
+	 */
+	List<Document> getColumnDocumentsByQueryAndTables(Integer datasourceId, String query, List<String> tableNames);
+
 }

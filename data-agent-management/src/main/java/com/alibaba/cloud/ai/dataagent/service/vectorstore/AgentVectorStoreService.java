@@ -45,6 +45,18 @@ public interface AgentVectorStoreService {
 	// 通过元数据过滤精确查找
 	List<Document> getDocumentsOnlyByFilter(Filter.Expression filterExpression, Integer topK);
 
+	/**
+	 * 带自定义过滤表达式的语义搜索。与 getDocumentsOnlyByFilter 不同，此方法使用真实的 query
+	 * 进行向量相似度排序，而非仅做元数据过滤。
+	 * @param query 用户查询文本，用于向量相似度匹配
+	 * @param filterExpression 自定义过滤表达式（如 datasourceId + vectorType 约束）
+	 * @param topK 返回的最大文档数
+	 * @param similarityThreshold 相似度阈值
+	 * @return 按相似度排序的文档列表
+	 */
+	List<Document> searchWithFilter(String query, Filter.Expression filterExpression, int topK,
+			double similarityThreshold);
+
 	boolean hasDocuments(String agentId);
 
 	void addDocuments(String agentId, List<Document> documents);
