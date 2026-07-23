@@ -70,7 +70,10 @@ public class ModelConfigDataServiceImpl implements ModelConfigDataService {
 	@Override
 	public List<ModelConfigDTO> listConfigs() {
 
-		return modelConfigMapper.findAll().stream().peek(this::decryptModelConfig).map(ModelConfigConverter::toDTO)
+		return modelConfigMapper.findAll()
+			.stream()
+			.peek(this::decryptModelConfig)
+			.map(ModelConfigConverter::toDTO)
 			.collect(Collectors.toList());
 	}
 

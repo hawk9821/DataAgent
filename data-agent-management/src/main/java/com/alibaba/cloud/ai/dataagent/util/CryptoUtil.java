@@ -139,8 +139,8 @@ public final class CryptoUtil {
 	}
 
 	/**
-	 * Check if a ciphertext string is already encrypted (Base64-encoded with valid length).
-	 * This is a heuristic check, not cryptographic verification.
+	 * Check if a ciphertext string is already encrypted (Base64-encoded with valid
+	 * length). This is a heuristic check, not cryptographic verification.
 	 * @param value the string to check
 	 * @return true if the value appears to be encrypted
 	 */
